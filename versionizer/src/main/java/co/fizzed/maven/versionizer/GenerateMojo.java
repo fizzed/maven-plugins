@@ -78,7 +78,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "timestamp", alias = "versionizer.timestampMillis", defaultValue = "", required = false)
+    @Parameter(property = "timestampMillis", alias = "versionizer.timestampMillis", defaultValue = "", required = false)
     protected Long versionTimestampMillis;
     
     /**
@@ -86,7 +86,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "timestamp", alias = "versionizer.timestamp", defaultValue = "", required = false)
+    @Parameter(property = "versionTimestamp", alias = "versionizer.timestamp", defaultValue = "", required = false)
     protected String versionTimestamp;
     
     /**
@@ -119,6 +119,7 @@ public class GenerateMojo extends AbstractMojo {
     @Component
     private RuntimeInformation runtime;
     
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (this.javaPackage == null || this.javaPackage.equals("")) {
             getLog().info("Skipping (property javaPackage is empty)");
