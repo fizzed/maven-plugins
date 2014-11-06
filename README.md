@@ -8,7 +8,7 @@ Maven Plugins by Fizzed
 
 ## Overview
 
-Collection of plugins for Maven builds.
+Collection of Maven plugins useful for tweaking builds.
 
 ## Versionizer (fizzed-versionizer-maven-plugin)
 
