@@ -70,7 +70,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "commit", alias = "versionizer.commit", defaultValue = "unknown", required = false)
+    @Parameter(property = "versionCommit", alias = "versionizer.commit", defaultValue = "unknown", required = false)
     protected String versionCommit;
     
     /**
@@ -78,7 +78,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "timestampMillis", alias = "versionizer.timestampMillis", defaultValue = "", required = false)
+    @Parameter(property = "versionTimestampMillis", alias = "versionizer.timestampMillis", defaultValue = "", required = false)
     protected Long versionTimestampMillis;
     
     /**
@@ -94,7 +94,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "version", alias = "versionizer.version", defaultValue = "${project.version}", required = true)
+    @Parameter(property = "versionVersion", alias = "versionizer.version", defaultValue = "${project.version}", required = true)
     protected String versionVersion;
     
     /**
@@ -102,7 +102,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "name", alias = "versionizer.name", defaultValue = "${project.artifactId}", required = true)
+    @Parameter(property = "versionName", alias = "versionizer.name", defaultValue = "${project.artifactId}", required = true)
     protected String versionName;
     
     /**
@@ -110,7 +110,7 @@ public class GenerateMojo extends AbstractMojo {
      * 
      * @since 1.0.0
      */
-    @Parameter(property = "vendor", alias = "versionizer.vendor", defaultValue = "${project.groupId}", required = true)
+    @Parameter(property = "versionVendor", alias = "versionizer.vendor", defaultValue = "${project.groupId}", required = true)
     protected String versionVendor;
     
     @Parameter( defaultValue = "${project}", readonly = true )
