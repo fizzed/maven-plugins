@@ -10,6 +10,7 @@ Maven Plugins by Fizzed
 
 Collection of plugins for Maven builds.
 
+
 ## Versionizer (fizzed-versionizer-maven-plugin)
 
 Maven plugin that generates a Java source file containing artifact
@@ -48,3 +49,35 @@ By default this will generate a Version.java source file in:
 
     ${project.build.directory}/generated-sources/versionizer
 
+
+## Play (fizzed-play-maven-plugin)
+
+Maven plugin that does a best-effort compile of PlayFramework 2.x templates
+(file.scala.html) into a Java source file.  This plugin is primarily a hack
+to make Netbeans function to work on PlayFramework projects using a pom.xml
+file.
+
+Templates are generated to ${project.build.directory}/generated-sources/play-templates
+
+To use add the following to your POM:
+
+    <build>
+        <plugins>
+            ...
+            <plugin>
+                <groupId>co.fizzed</groupId>
+                <artifactId>fizzed-play-maven-plugin</artifactId>
+                <version>USE-LATEST-HERE</version>
+                <executions>
+                    <execution>
+                        <id>best-effort-play-template-compiler</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>template-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            ...
+        </plugins>
+    </build>

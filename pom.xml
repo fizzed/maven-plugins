@@ -48,6 +48,7 @@
 
     <modules>
         <module>versionizer</module>
+	<module>play</module>
     </modules>
 
     <build>
