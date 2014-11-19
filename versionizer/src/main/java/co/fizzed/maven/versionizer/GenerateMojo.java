@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -136,9 +134,11 @@ public class GenerateMojo extends AbstractMojo {
         getLog().info("Versionizer generated source directory: " + outputDirectory + " added to project" );
     
         // convert javaPackage into directory name
-        String javaPackagePath = this.javaPackage.replaceAll("\\.", File.separator);
+        String javaPackagePath = this.javaPackage.replace('.', File.separatorChar);
+        getLog().debug("Versionizer java package converted to path: " + javaPackagePath);
         File javaPackageDir = new File(outputDirectory, javaPackagePath);
         javaPackageDir.mkdirs();
+        getLog().debug("Versionizer java package dir: " + javaPackageDir);
         
         File javaClassFile = new File(javaPackageDir, this.className + ".java");
         getLog().info("Versionizer generating version java source: " + javaClassFile);
