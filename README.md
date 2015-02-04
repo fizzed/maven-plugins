@@ -3,7 +3,7 @@ Maven Plugins by Fizzed
 
 ## By
 
- - [Fizzed, Inc.](http://fizzed.co)
+ - [Fizzed, Inc.](http://fizzed.com)
  - Joe Lauer (Twitter: [@jjlauer](http://twitter.com/jjlauer))
 
 ## Overview
@@ -26,7 +26,7 @@ To use add the following to your POM:
         <plugins>
             ...
             <plugin>
-                <groupId>co.fizzed</groupId>
+                <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-versionizer-maven-plugin</artifactId>
                 <version>USE-LATEST-HERE</version>
                 <executions>
@@ -36,7 +36,7 @@ To use add the following to your POM:
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <javaPackage>co.fizzed.examples.helloworld</javaPackage>
+                            <javaPackage>com.fizzed.examples.helloworld</javaPackage>
                         </configuration>
                     </execution>
                 </executions> 
@@ -65,7 +65,7 @@ To use add the following to your POM:
         <plugins>
             ...
             <plugin>
-                <groupId>co.fizzed</groupId>
+                <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-play-maven-plugin</artifactId>
                 <version>USE-LATEST-HERE</version>
                 <executions>

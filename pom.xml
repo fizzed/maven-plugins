@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>co.fizzed</groupId>
+    <groupId>com.fizzed</groupId>
     <artifactId>fizzed-maven-plugins-parent</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
@@ -18,7 +18,7 @@
     
     <organization>
         <name>Fizzed Inc</name>
-        <url>http://fizzed.co</url>
+        <url>http://fizzed.com</url>
     </organization>
     
     <scm>
@@ -29,7 +29,7 @@
     
     <developers>
         <developer>
-            <email>oss@fizzed.co</email>
+            <email>oss@fizzed.com</email>
         </developer>
     </developers>
 
@@ -56,7 +56,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.4</version>
                 <configuration>
                     <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
@@ -127,7 +127,7 @@
                 <version>2.5.1</version>
                 <configuration>
                     <!-- use @ for propert to be interpolated -->
-                    <tagNameFormat>version-@{project.version}</tagNameFormat>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
         </plugins>
@@ -148,7 +148,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

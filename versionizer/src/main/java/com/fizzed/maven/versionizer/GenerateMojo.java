@@ -1,4 +1,4 @@
-package co.fizzed.maven.versionizer;
+package com.fizzed.maven.versionizer;
 
 import java.io.File;
 import java.io.FileWriter;

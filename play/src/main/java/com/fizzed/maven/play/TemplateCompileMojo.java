@@ -1,12 +1,9 @@
-package co.fizzed.maven.play;
+package com.fizzed.maven.play;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -162,7 +159,4 @@ public class TemplateCompileMojo extends AbstractMojo {
         fos.flush();
         fos.close();
     }
-    
-    
-    
 }

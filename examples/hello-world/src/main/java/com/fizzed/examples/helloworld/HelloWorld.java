@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package co.fizzed.examples.helloworld;
+package com.fizzed.examples.helloworld;
 
 /**
  *
