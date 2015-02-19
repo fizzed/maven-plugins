@@ -9,7 +9,6 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -19,14 +18,13 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import org.apache.maven.Maven;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -40,6 +38,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.codehaus.plexus.util.DirectoryScanner;
 
 /**
  * Utility for watching directories/files and triggering a maven goal.
@@ -51,9 +50,9 @@ public class RunMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${session}", required = true, readonly = true)
     protected MavenSession session;
-
-    @Parameter(property = "files", alias = "watcher.files", required = true)
-    protected List<String> files;
+    
+    @Parameter(property = "watches", alias = "watcher.watches", required = true)
+    protected List<WatchFileSet> watches;
 
     @Parameter(property = "goals", alias = "watcher.goals", required = true)
     protected List<String> goals;
@@ -71,11 +70,13 @@ public class RunMojo extends AbstractMojo {
     protected Maven maven;
 
     private WatchService watchService;
+    private Map<Path, WatchFileSet> configMap;
     private Map<Path, WatchKey> pathMap;
     private Map<WatchKey, Path> watchKeyMap;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        this.configMap = new HashMap<>();
         this.pathMap = new HashMap<>();
         this.watchKeyMap = new HashMap<>();
 
@@ -85,7 +86,31 @@ public class RunMojo extends AbstractMojo {
             throw new MojoExecutionException("Unable to create watch service");
         }
 
-        getLog().info("Recursively registering " + files.size() + " dirs...");
+        getLog().info("Registering " + watches.size() + " watch sets...");
+        
+        for (WatchFileSet wfs : watches) {
+            getLog().info("Registering watch set: " + wfs);
+            
+            File dir = new File(wfs.getDirectory());
+            if (!dir.exists()) {
+                throw new MojoFailureException("Directory " + dir + " does not exist. Unable to watch a dir that does not exist");
+            }
+            if (!dir.isDirectory()) {
+                throw new MojoFailureException("Unable to watch " + dir + " - its not a directory");
+            }
+            
+            // add config for this path
+            // maven is somehow garbage collecting my includes value -- create copy instead...
+            this.configMap.put(dir.toPath(), wfs);
+            
+            if (wfs.isRecursive()) {
+                this.walkTreeAndSetWatches(dir, null);
+            } else {
+                this.registerWatch(dir.toPath());
+            }
+        }
+        
+        /**
         for (String s : files) {
             File f = new File(s);
             if (f.isFile()) {
@@ -94,11 +119,12 @@ public class RunMojo extends AbstractMojo {
                 this.walkTreeAndSetWatches(f);
             }
         }
+        */
 
         long longTimeout = 60 * 60 * 24 * 1000L;
-        long shortTimeout = 500L;
+        long shortTimeout = 750L;
         long timeout = longTimeout;
-        boolean dueToRunGoal = false;
+        int dueToRunGoal = 0;
         
         while (true) {
             try {
@@ -112,49 +138,86 @@ public class RunMojo extends AbstractMojo {
                 WatchKey watchKey = watchService.poll(timeout, TimeUnit.MILLISECONDS);
                 if (watchKey == null) {
                     // timeout occurred!
-                    if (dueToRunGoal) {
+                    if (dueToRunGoal > 0) {
                         MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(session.getRequest());
                         if (this.profiles != null && this.profiles.size() > 0) {
                             request.setActiveProfiles(profiles);
                         }
                         request.setGoals(goals);
+                        
+                        
+                        getLog().info("Changed detected. Running command-line equivalent of:");
+                        getLog().info(" " + this.buildMavenCommandLineEquivalent());
                         maven.execute(request);
                     }
                     
                     timeout = longTimeout;
-                    dueToRunGoal = false;
+                    dueToRunGoal = 0;
                     continue;
                 }
                 
                 // schedule the goal to run
                 timeout = shortTimeout;
-                dueToRunGoal = true;
+                dueToRunGoal++;
                 
                 Path watchPath = watchKeyMap.get(watchKey);
 
                 List<WatchEvent<?>> pollEvents = watchKey.pollEvents(); // take events, but don't care what they are!
                 for (WatchEvent event : pollEvents) {
                     if (event.context() instanceof Path) {
+                        // event is always relative to what was watched (e.g. testdir)
                         Path eventPath = (Path) event.context();
+                        // resolve relative to path watched (e.g. dir/watched/testdir)
                         Path path = watchPath.resolve(eventPath);
+                        
                         File file = path.toFile();
                         String fileOrDir = (file.isDirectory() ? "directory" : "file");
+                        
+                        // find the assigned watch config so we can see if has includes/excludes
+                        WatchFileSet wfs = findWatchFileSet(path);
 
+                        getLog().debug("eventPath: " + eventPath);
+                        getLog().debug("watchFileSet: " + wfs);
+                        
+                        boolean matches = matches(eventPath.toString(), wfs);
+                        getLog().debug("Watcher - matches=" + matches);
+                        
                         if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                             getLog().info("Watcher - " + fileOrDir + " created: " + path);
+                            // only schedule new directory to be watched if we're recursive
                             if (file.isDirectory()) {
-                                // need to register this new directory as something to watch
-                                walkTreeAndSetWatches(file);
+                                if (wfs.isRecursive()) {
+                                    // register this new directory as something to watch
+                                    walkTreeAndSetWatches(file, new File(wfs.getDirectory()));
+                                }
+                                // directories by themselves do not trigger a match
+                                matches = false;
                             }
                         } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
                             getLog().info("Watcher - " + fileOrDir + " deleted: " + path);
                             // need to unregister any stale directories from watching
-                            unregisterStaleWatches();
+                            int count = unregisterStaleWatches();
+                            if (count > 0 && count == event.count()) {
+                                // if stale dirs were removed and it matches events count
+                                // then should be safe to ignore it
+                                matches = false;
+                            }
                         } else if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
                             getLog().info("Watcher - " + fileOrDir + " modified: " + path);
+                            // only schedule new directory to be watched if we're recursive
+                            if (file.isDirectory()) {
+                                // directories by themselves do not trigger a match
+                                matches = false;
+                            }
                         } else if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
                             getLog().warn("Watcher - some events may have been discarded!!!!");
                             getLog().warn("Ideally, just restart maven to pick it up again");
+                        }
+                        
+                        // if no match then do NOT trigger a change
+                        if (!matches) {
+                            getLog().info("Change either a dir or did not match includes/excludes (not triggering goals...)");
+                            dueToRunGoal--;
                         }
                     }
                 }
@@ -165,10 +228,90 @@ public class RunMojo extends AbstractMojo {
             }
         }
     }
+    
+    public String buildMavenCommandLineEquivalent() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("mvn");
+        if (this.profiles != null && this.profiles.size() > 0) {
+            for (String p : this.profiles) {
+                sb.append(" -P").append(p);
+            }
+        }
+        if (this.goals != null && this.goals.size() > 0) {
+            for (String g : this.goals) {
+                sb.append(" ").append(g);
+            }
+        }
+        return sb.toString();
+    }
+    
+    public void addWatch(WatchFileSet wfs) {
+        if (this.watches == null) {
+            this.watches = new ArrayList<>();
+        }
+        this.watches.add(wfs);
+    }
+    
+    private WatchFileSet findWatchFileSet(Path path) {
+        // start from back and work to front
+        Path p = path;
+        while (p != null) {
+            if (this.configMap.containsKey(p)) {
+                return this.configMap.get(p);
+            }
+            p = p.getParent();
+        }
+        return null;
+    }
+    
+    private boolean matches(String name, WatchFileSet wfs) {
+        boolean matches = false;
+        
+        // if no excludes & no includes then everything matches
+        if ((wfs.getIncludes() == null || wfs.getIncludes().isEmpty()) &&
+                (wfs.getExcludes() == null || wfs.getExcludes().isEmpty())) {
+            matches = true;
+        }
+        
+        // process includes first
+        if (wfs.getIncludes() != null) {
+            for (String include : wfs.getIncludes()) {
+                getLog().debug("Trying to match: include=" + include + " for name " + name);
+                if (DirectoryScanner.match(include, name)) {
+                    matches = true;
+                    break;
+                }
+            }
+        }
+        
+        // process excludes second
+        if (wfs.getExcludes() != null) {
+            for (String exclude : wfs.getExcludes()) {
+                getLog().debug("Trying to match: exclude=" + exclude + " for name " + name);
+                if (DirectoryScanner.match(exclude, name)) {
+                    matches = false;
+                    break;
+                }
+            }
+        }
+        
+        return matches;
+    }
 
-    private void walkTreeAndSetWatches(File file) {
+    private void walkTreeAndSetWatches(File dir, File root) {
         try {
-            Files.walkFileTree(file.toPath(), new FileVisitor<Path>() {
+            // does the new directory have a root we need to check back towards?
+            if (root != null) {
+                Path parent = dir.toPath().getParent();
+                if (!pathMap.containsKey(parent)) {
+                    // safer to just re-walk entire tree
+                    walkTreeAndSetWatches(root, null);
+                    return;
+                }
+                // otherwise the new directory already has its parent registered!
+            }
+            
+            Files.walkFileTree(dir.toPath(), new FileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                     registerWatch(dir);
@@ -195,7 +338,7 @@ public class RunMojo extends AbstractMojo {
         }
     }
 
-    private void unregisterStaleWatches() {
+    private int unregisterStaleWatches() {
         Set<Path> paths = new HashSet<>(pathMap.keySet());
         Set<Path> stalePaths = new HashSet<>();
 
@@ -211,6 +354,8 @@ public class RunMojo extends AbstractMojo {
                 unregisterWatch(stalePath);
             }
         }
+        
+        return stalePaths.size();
     }
 
     private void registerWatch(Path dir) {

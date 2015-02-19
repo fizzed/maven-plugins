@@ -31,22 +31,38 @@ To use add the following to your POM:
                 <artifactId>fizzed-watcher-maven-plugin</artifactId>
                 <version>1.0.4</version>
                 <configuration>
-                    <files>
-                        <param>src/main/java</param>
-                        <param>src/main/resources</param>
-                    </files>
+                    <watches>
+                        <watch>
+                            <directory>core/src/main/java</directory>
+                        </watch>
+                        <watch>
+                            <directory>ninja/src/main/java</directory>
+                        </watch>
+                    </watches>
                     <goals>
-                        <param>clean</param>
-                        <param>compile</param>
+                        <goal>compile</goal>
+                        <goal>process-classes</goal>
                     </goals>
                     <profiles>
-                        <param>profile-to-activate</param>
+                        <profile>optional-profile-to-activate</profile>
                     </profiles>
                 </configuration>
             </plugin>
             ...
         </plugins>
     </build>
+
+Each watch entry may also contain include and exclude properties as well as
+enabling/disabling of recursively watching a directory.  Here is an example of
+watching a directory, but excluding files with a suffix of *.html.
+
+    <watch>
+        <directory>src/main/java</directory>
+        <exclude>*.html</exclude>
+    </watch>
+
+You may add any number of exclude and include entries.  The recursive property
+can be set to true/false to disable/enable recursively watching a directory.
 
 By default this maven plugin does NOT attach to a lifecycle -- since it is 
 essentially a daemon that runs forever.  Usually, you'll run this in a separate
