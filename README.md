@@ -29,7 +29,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-watcher-maven-plugin</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <configuration>
                     <watches>
                         <watch>
@@ -88,7 +88,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-versionizer-maven-plugin</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <executions>
                     <execution>
                         <id>generate-version-class</id>
@@ -127,7 +127,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-play-maven-plugin</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <executions>
                     <execution>
                         <id>best-effort-play-template-compiler</id>
