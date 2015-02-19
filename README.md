@@ -1,4 +1,4 @@
-Maven Plugins by Fizzed
+Maven Plugins by Fizzed [![Build Status](https://buildhive.cloudbees.com/job/fizzed/job/java-maven-plugins/badge/icon)](https://buildhive.cloudbees.com/job/fizzed/job/java-maven-plugins/)
 =======================================
 
  - [Fizzed, Inc.](http://fizzed.com)
