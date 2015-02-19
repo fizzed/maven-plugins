@@ -4,7 +4,7 @@
     <artifactId>fizzed-maven-plugins-parent</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
-    <version>1.0.4</version>
+    <version>1.0.5-SNAPSHOT</version>
     <description>Parent pom for all Fizzed Maven plugin projects</description>
     <url>https://github.com/fizzed/java-maven-plugins</url>
     
@@ -24,7 +24,7 @@
     <scm>
         <url>https://github.com/fizzed/java-maven-plugins</url>
         <connection>scm:git:git@github.com:fizzed/java-maven-plugins.git</connection>
-        <tag>v1.0.4</tag>
+        <tag>version-1.0.2</tag>
     </scm>
     
     <developers>
