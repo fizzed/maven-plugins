@@ -11,9 +11,15 @@ Collection of Maven plugins useful for gettin 'er done.
 
 ## Watcher (fizzed-watcher-maven-plugin)
 
-Maven plugin that continually "watches" one or more directories for file changes
-and runs one or more maven goals (in the same maven session).  Optional active
-profiles can be included as well.  Useful for lots of things...
+Ever wish Maven could run a specific command if any files in your project change? Some IDEs
+have their own features to do X if a file changes, but they usually don't take your full Maven
+project file into account. Problem finally solved with the Watcher Plugin for Maven. Add to your
+Maven project file and fire it up in a new shell. Maven will continuously and recursively
+watch any number of configured directories and then execute a series of goals if a file change
+is detected. Just like if you typed it on the command-line! We use it at Fizzed across a bunch
+of projects, but mainly our web projects -- where we want a full compile run any time our Java
+code, resources, or templates change. Works especially well from a project parent to watch any
+of your sub modules too.
 
 To use add the following to your POM:
 
