@@ -49,6 +49,7 @@
     <modules>
         <module>versionizer</module>
 	<module>play</module>
+        <module>watcher</module>
     </modules>
 
     <build>

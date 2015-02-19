@@ -1,14 +1,46 @@
 Maven Plugins by Fizzed
 =======================================
 
-## By
-
  - [Fizzed, Inc.](http://fizzed.com)
  - Joe Lauer (Twitter: [@jjlauer](http://twitter.com/jjlauer))
 
 ## Overview
 
-Collection of Maven plugins useful for tweaking builds.
+Collection of Maven plugins useful for gettin 'er done.
+
+
+## Watcher (fizzed-watcher-maven-plugin)
+
+Maven plugin that continually "watches" one or more directories for file changes
+and runs one or more maven goals (in the same maven session).  Optional active
+profiles can be included as well.  Useful for lots of things...
+
+To use add the following to your POM:
+
+    <build>
+        <plugins>
+            ...
+            <plugin>
+                <groupId>com.fizzed</groupId>
+                <artifactId>fizzed-watcher-maven-plugin</artifactId>
+                <version>1.0.4</version>
+                <configuration>
+                    <files>
+                        <param>src/main/java</param>
+                        <param>src/main/resources</param>
+                    </files>
+                    <goals>
+                        <param>clean</param>
+                        <param>compile</param>
+                    </goals>
+                    <profiles>
+                        <param>profile-to-activate</param>
+                    </profiles>
+                </configuration>
+            </plugin>
+            ...
+        </plugins>
+    </build>
 
 
 ## Versionizer (fizzed-versionizer-maven-plugin)
@@ -28,7 +60,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-versionizer-maven-plugin</artifactId>
-                <version>USE-LATEST-HERE</version>
+                <version>1.0.4</version>
                 <executions>
                     <execution>
                         <id>generate-version-class</id>
@@ -67,7 +99,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-play-maven-plugin</artifactId>
-                <version>USE-LATEST-HERE</version>
+                <version>1.0.4</version>
                 <executions>
                     <execution>
                         <id>best-effort-play-template-compiler</id>
