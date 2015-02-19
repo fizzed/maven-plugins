@@ -42,6 +42,12 @@ To use add the following to your POM:
         </plugins>
     </build>
 
+By default this maven plugin does NOT attach to a lifecycle -- since it is 
+essentially a daemon that runs forever.  Usually, you'll run this in a separate
+shell and run via:
+
+    mvn fizzed-watcher:run
+
 
 ## Versionizer (fizzed-versionizer-maven-plugin)
 
@@ -77,11 +83,9 @@ To use add the following to your POM:
         </plugins>
     </build>
 
-By default this maven plugin does NOT attach to a lifecycle -- since it is 
-essentially a daemon that runs forever.  Usually, you'll run this in a separate
-shell and run via:
+By default this will generate a Version.java source file in:
 
-    mvn fizzed-watcher:run
+    ${project.build.directory}/generated-sources/versionizer
 
 
 ## Play (fizzed-play-maven-plugin)
