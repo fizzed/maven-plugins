@@ -77,9 +77,11 @@ To use add the following to your POM:
         </plugins>
     </build>
 
-By default this will generate a Version.java source file in:
+By default this maven plugin does NOT attach to a lifecycle -- since it is 
+essentially a daemon that runs forever.  Usually, you'll run this in a separate
+shell and run via:
 
-    ${project.build.directory}/generated-sources/versionizer
+    mvn fizzed-watcher:run
 
 
 ## Play (fizzed-play-maven-plugin)
