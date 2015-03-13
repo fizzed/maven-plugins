@@ -21,6 +21,9 @@ of projects, but mainly our web projects -- where we want a full compile run any
 code, resources, or templates change. Works especially well from a project parent to watch any
 of your sub modules too.
 
+To assist in using this plugin to trigger other workflow/plugins, v1.0.6 added
+a feature to "touch" a file upon successful execution of the maven goal(s).
+
 To use add the following to your POM:
 
     <build>
@@ -29,8 +32,9 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-watcher-maven-plugin</artifactId>
-                <version>1.0.5</version>
+                <version>1.0.6</version>
                 <configuration>
+                    <touchFile>target/classes/watcher.txt</touchFile>
                     <watches>
                         <watch>
                             <directory>core/src/main/java</directory>
@@ -88,7 +92,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-versionizer-maven-plugin</artifactId>
-                <version>1.0.5</version>
+                <version>1.0.6</version>
                 <executions>
                     <execution>
                         <id>generate-version-class</id>
@@ -114,7 +118,7 @@ By default this will generate a Version.java source file in:
 
 Maven plugin that does a best-effort compile of PlayFramework 2.x templates
 (file.scala.html) into a Java source file.  This plugin is primarily a hack
-to make Netbeans function to work on PlayFramework projects using a pom.xml
+to make Netbeans function to code complte on PlayFramework projects using a pom.xml
 file.
 
 Templates are generated to ${project.build.directory}/generated-sources/play-templates
@@ -127,7 +131,7 @@ To use add the following to your POM:
             <plugin>
                 <groupId>com.fizzed</groupId>
                 <artifactId>fizzed-play-maven-plugin</artifactId>
-                <version>1.0.5</version>
+                <version>1.0.6</version>
                 <executions>
                     <execution>
                         <id>best-effort-play-template-compiler</id>
