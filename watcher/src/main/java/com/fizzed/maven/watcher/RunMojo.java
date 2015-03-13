@@ -1,6 +1,7 @@
 package com.fizzed.maven.watcher;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.maven.Maven;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -59,6 +61,12 @@ public class RunMojo extends AbstractMojo {
     
     @Parameter(property = "profiles", alias = "watcher.profiles", required = false)
     protected List<String> profiles;
+    
+    @Parameter(property = "watcher.skipTouch", defaultValue = "false")
+    protected boolean skipTouch;
+    
+    @Parameter(property = "watcher.touchFile", defaultValue = "${project.build.directory}/watcher.txt")
+    protected File touchFile;
 
     @Component
     protected PluginPrefixResolver pluginPrefixResolver;
@@ -109,17 +117,6 @@ public class RunMojo extends AbstractMojo {
                 this.registerWatch(dir.toPath());
             }
         }
-        
-        /**
-        for (String s : files) {
-            File f = new File(s);
-            if (f.isFile()) {
-                this.registerWatch(f.toPath());
-            } else {
-                this.walkTreeAndSetWatches(f);
-            }
-        }
-        */
 
         long longTimeout = 60 * 60 * 24 * 1000L;
         long shortTimeout = 750L;
@@ -145,10 +142,19 @@ public class RunMojo extends AbstractMojo {
                         }
                         request.setGoals(goals);
                         
-                        
                         getLog().info("Changed detected. Running command-line equivalent of:");
                         getLog().info(" " + this.buildMavenCommandLineEquivalent());
-                        maven.execute(request);
+                        MavenExecutionResult executionResult = maven.execute(request);
+                        
+                        if (executionResult.hasExceptions()) {
+                            getLog().error(("Goal(s) had exceptions, skipping touch file"));
+                        }
+                        else {
+                            // touch file after maven executed its "task" -- which is useful
+                            // if other things are waiting for a change and they really just
+                            // want to know when the watcher plugin ran again...
+                            touchFileIfRequested();
+                        }
                     }
                     
                     timeout = longTimeout;
@@ -229,6 +235,26 @@ public class RunMojo extends AbstractMojo {
         }
     }
     
+    public void touchFileIfRequested() {
+        if (!skipTouch) {
+            if (touchFile != null) {
+                getLog().info("Touching file " + touchFile);
+                try {
+                    if (!touchFile.exists()) {
+                        File parent = touchFile.getParentFile();
+                        if (parent != null) {
+                            parent.mkdirs();
+                        }
+                        new FileOutputStream(touchFile).close();
+                    }
+                    touchFile.setLastModified(System.currentTimeMillis());
+                } catch (IOException e) {
+                    getLog().debug("Unable to touch file", e);
+                }
+            }
+        }
+    }
+    
     public String buildMavenCommandLineEquivalent() {
         StringBuilder sb = new StringBuilder();
         sb.append("mvn");
@@ -274,7 +300,7 @@ public class RunMojo extends AbstractMojo {
         }
         
         // process includes first
-        if (wfs.getIncludes() != null) {
+        if (wfs.getIncludes() != null && !wfs.getIncludes().isEmpty()) {
             for (String include : wfs.getIncludes()) {
                 getLog().debug("Trying to match: include=" + include + " for name " + name);
                 if (DirectoryScanner.match(include, name)) {
@@ -282,6 +308,10 @@ public class RunMojo extends AbstractMojo {
                     break;
                 }
             }
+        }
+        else {
+            // no specific includes, everything will be included then
+            matches = true;
         }
         
         // process excludes second
