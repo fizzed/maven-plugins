@@ -1,4 +1,4 @@
-Maven Plugins by Fizzed [![Build Status](https://travis-ci.org/fizzed/java-maven-plugins.svg)](https://travis-ci.org/fizzed/java-maven-plugins)
+Maven Plugins by Fizzed [![Build Status](https://travis-ci.org/fizzed/maven-plugins.svg)](https://travis-ci.org/fizzed/java-maven-plugins)
 =======================================
 
  - [Fizzed, Inc.](http://fizzed.com)
