@@ -125,7 +125,7 @@ By default this will generate a Version.java source file in:
 
 Maven plugin that does a best-effort compile of PlayFramework 2.x templates
 (file.scala.html) into a Java source file.  This plugin is primarily a hack
-to make Netbeans function to code complte on PlayFramework projects using a pom.xml
+to make Netbeans function to code complete PlayFramework projects using a pom.xml
 file.
 
 Templates are generated to ${project.build.directory}/generated-sources/play-templates
