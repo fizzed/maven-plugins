@@ -26,44 +26,48 @@ a feature to "touch" a file upon successful execution of the maven goal(s).
 
 To use add the following to your POM:
 
-    <build>
-        <plugins>
-            ...
-            <plugin>
-                <groupId>com.fizzed</groupId>
-                <artifactId>fizzed-watcher-maven-plugin</artifactId>
-                <version>1.0.6</version>
-                <configuration>
-                    <touchFile>target/classes/watcher.txt</touchFile>
-                    <watches>
-                        <watch>
-                            <directory>core/src/main/java</directory>
-                        </watch>
-                        <watch>
-                            <directory>ninja/src/main/java</directory>
-                        </watch>
-                    </watches>
-                    <goals>
-                        <goal>compile</goal>
-                        <goal>process-classes</goal>
-                    </goals>
-                    <profiles>
-                        <profile>optional-profile-to-activate</profile>
-                    </profiles>
-                </configuration>
-            </plugin>
-            ...
-        </plugins>
-    </build>
+```xml
+<build>
+    <plugins>
+        ...
+        <plugin>
+            <groupId>com.fizzed</groupId>
+            <artifactId>fizzed-watcher-maven-plugin</artifactId>
+            <version>1.0.6</version>
+            <configuration>
+                <touchFile>target/classes/watcher.txt</touchFile>
+                <watches>
+                    <watch>
+                        <directory>core/src/main/java</directory>
+                    </watch>
+                    <watch>
+                        <directory>ninja/src/main/java</directory>
+                    </watch>
+                </watches>
+                <goals>
+                    <goal>compile</goal>
+                    <goal>process-classes</goal>
+                </goals>
+                <profiles>
+                    <profile>optional-profile-to-activate</profile>
+                </profiles>
+            </configuration>
+        </plugin>
+        ...
+    </plugins>
+</build>
+```
 
 Each watch entry may also contain include and exclude properties as well as
 enabling/disabling of recursively watching a directory.  Here is an example of
 watching a directory, but excluding files with a suffix of *.html.
 
-    <watch>
-        <directory>src/main/java</directory>
-        <exclude>*.html</exclude>
-    </watch>
+```xml
+<watch>
+    <directory>src/main/java</directory>
+    <exclude>*.html</exclude>
+</watch>
+```
 
 You may add any number of exclude and include entries.  The recursive property
 can be set to true/false to disable/enable recursively watching a directory.
@@ -72,8 +76,9 @@ By default this maven plugin does NOT attach to a lifecycle -- since it is
 essentially a daemon that runs forever.  Usually, you'll run this in a separate
 shell and run via:
 
-    mvn fizzed-watcher:run
-
+```bash
+mvn fizzed-watcher:run
+```
 
 ## Versionizer (fizzed-versionizer-maven-plugin)
 
@@ -86,28 +91,30 @@ picked up during the compile phase).
 
 To use add the following to your POM:
 
-    <build>
-        <plugins>
-            ...
-            <plugin>
-                <groupId>com.fizzed</groupId>
-                <artifactId>fizzed-versionizer-maven-plugin</artifactId>
-                <version>1.0.6</version>
-                <executions>
-                    <execution>
-                        <id>generate-version-class</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <javaPackage>com.fizzed.examples.helloworld</javaPackage>
-                        </configuration>
-                    </execution>
-                </executions> 
-            </plugin>
-            ...
-        </plugins>
-    </build>
+```xml
+<build>
+    <plugins>
+        ...
+        <plugin>
+            <groupId>com.fizzed</groupId>
+            <artifactId>fizzed-versionizer-maven-plugin</artifactId>
+            <version>1.0.6</version>
+            <executions>
+                <execution>
+                    <id>generate-version-class</id>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <javaPackage>com.fizzed.examples.helloworld</javaPackage>
+                    </configuration>
+                </execution>
+            </executions> 
+        </plugin>
+        ...
+    </plugins>
+</build>
+```
 
 By default this will generate a Version.java source file in:
 
@@ -125,23 +132,25 @@ Templates are generated to ${project.build.directory}/generated-sources/play-tem
 
 To use add the following to your POM:
 
-    <build>
-        <plugins>
-            ...
-            <plugin>
-                <groupId>com.fizzed</groupId>
-                <artifactId>fizzed-play-maven-plugin</artifactId>
-                <version>1.0.6</version>
-                <executions>
-                    <execution>
-                        <id>best-effort-play-template-compiler</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>template-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            ...
-        </plugins>
-    </build>
+```xml
+<build>
+    <plugins>
+        ...
+        <plugin>
+            <groupId>com.fizzed</groupId>
+            <artifactId>fizzed-play-maven-plugin</artifactId>
+            <version>1.0.6</version>
+            <executions>
+                <execution>
+                    <id>best-effort-play-template-compiler</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>template-compile</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        ...
+    </plugins>
+</build>
+```
