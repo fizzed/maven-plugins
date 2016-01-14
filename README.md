@@ -154,3 +154,9 @@ To use add the following to your POM:
     </plugins>
 </build>
 ```
+
+## License
+
+Copyright (C) 2015 Fizzed, Inc.
+
+This work is licensed under the Apache License, Version 2.0. See LICENSE for details.
