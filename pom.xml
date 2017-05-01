@@ -4,7 +4,7 @@
     <artifactId>fizzed-maven-plugins</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
     <description>Parent pom for all Fizzed Maven plugin projects</description>
     <url>https://github.com/fizzed/java-maven-plugins</url>
     
