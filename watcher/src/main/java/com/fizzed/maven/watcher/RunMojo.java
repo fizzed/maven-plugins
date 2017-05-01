@@ -3,6 +3,7 @@ package com.fizzed.maven.watcher;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -19,12 +20,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.apache.maven.Maven;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -61,7 +57,10 @@ public class RunMojo extends AbstractMojo {
     
     @Parameter(property = "profiles", alias = "watcher.profiles", required = false)
     protected List<String> profiles;
-    
+
+    @Parameter(property = "properties", alias = "watcher.properties", required = false)
+    protected List<String> properties;
+
     @Parameter(property = "watcher.skipTouch", defaultValue = "false")
     protected boolean skipTouch;
     
@@ -140,8 +139,13 @@ public class RunMojo extends AbstractMojo {
                         if (this.profiles != null && this.profiles.size() > 0) {
                             request.setActiveProfiles(profiles);
                         }
+
+                        if (this.properties != null && this.properties.size() > 0) {
+                            request.setSystemProperties(this.parsePropertiesStringList(this.properties));
+                        }
+
                         request.setGoals(goals);
-                        
+
                         getLog().info("Changed detected. Running command-line equivalent of:");
                         getLog().info(" " + this.buildMavenCommandLineEquivalent());
                         MavenExecutionResult executionResult = maven.execute(request);
@@ -410,5 +414,20 @@ public class RunMojo extends AbstractMojo {
             pathMap.remove(dir);
             watchKeyMap.remove(watchKey);
         }
+    }
+
+    private Properties parsePropertiesStringList(List<String> stringList) {
+        final Properties p = new Properties();
+        for (String s : stringList) {
+            try {
+                p.load(new StringReader(s));
+            } catch (IOException e) {
+                getLog().error("Properties - unable to read string: " + s);
+            }
+
+            getLog().debug("Properties - added to Properties HashTable: " + s);
+        }
+
+        return p;
     }
 }
