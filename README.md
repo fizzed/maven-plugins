@@ -1,13 +1,26 @@
-Maven Plugins by Fizzed [![Build Status](https://travis-ci.org/fizzed/maven-plugins.svg)](https://travis-ci.org/fizzed/java-maven-plugins)
-=======================================
+# Maven Plugins by Fizzed
 
- - [Fizzed, Inc.](http://fizzed.com)
- - Joe Lauer (Twitter: [@jjlauer](http://twitter.com/jjlauer))
+[![Build Status](https://travis-ci.org/fizzed/maven-plugins.svg)](https://travis-ci.org/fizzed/java-maven-plugins)
 
 ## Overview
 
-Collection of Maven plugins useful for gettin 'er done.
+Collection of Maven plugins for various tasks.
 
+## Sponsorship & Support
+
+![](https://cdn.fizzed.com/github/fizzed-logo-100.png)
+
+Project by [Fizzed, Inc.](http://fizzed.com) (Follow on Twitter: [@fizzed_inc](http://twitter.com/fizzed_inc))
+
+**Developing and maintaining opensource projects requires significant time.** If you find this project useful or need
+commercial support, we'd love to chat. Drop us an email at [ping@fizzed.com](mailto:ping@fizzed.com)
+
+Project sponsors may include the following benefits:
+
+- Priority support (outside of Github)
+- Feature development & roadmap
+- Priority bug fixes
+- Privately hosted continuous integration tests for their unique edge or use cases
 
 ## Watcher (fizzed-watcher-maven-plugin)
 
