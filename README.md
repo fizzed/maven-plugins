@@ -20,8 +20,6 @@ Project sponsors may include the following benefits:
 - Priority bug fixes
 - Privately hosted continuous integration tests for their unique edge or use cases
 
-# Maven Plugins by Fizzed
-
 ## Version Maven Plugin
 
 Provides a plugin to generate Java source code which contains a `Version` class with information about the version of
