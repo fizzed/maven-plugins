@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="versionizer-maven-plugin" />
+        <module name="watcher-maven-plugin" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="fizzed-play-maven-plugin" target="1.6" />
+      <module name="fizzed-versionizer-maven-plugin" target="1.8" />
+      <module name="fizzed-watcher-maven-plugin" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="fizzed-maven-plugins" options="" />
+      <module name="fizzed-versionizer-maven-plugin" options="-parameters" />
+      <module name="fizzed-watcher-maven-plugin" options="-parameters" />
+      <module name="versionizer-maven-plugin" options="-parameters" />
+      <module name="watcher-maven-plugin" options="-parameters" />
+    </option>
+  </component>
+</project>
