@@ -1,27 +1,60 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>com.fizzed</groupId>
     <artifactId>maven-plugins</artifactId>
     <name>maven-plugins</name>
     <packaging>pom</packaging>
     <version>1.0.7-SNAPSHOT</version>
     <description>Parent pom for all Fizzed Maven plugin projects</description>
     <url>https://github.com/fizzed/java-maven-plugins</url>
-    
-    <parent>
-        <groupId>com.fizzed</groupId>
-        <artifactId>maven-parent</artifactId>
-        <version>3.3.0</version>
-    </parent>
-    
+
+    <inceptionYear>2016</inceptionYear>
+
+    <organization>
+        <name>Fizzed, Inc</name>
+        <url>http://fizzed.com</url>
+    </organization>
+
+    <prerequisites>
+        <maven>3.2.5</maven>
+    </prerequisites>
+
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <scm>
         <url>https://github.com/fizzed/maven-plugins</url>
         <connection>scm:git:git@github.com:fizzed/maven-plugins.git</connection>
         <tag>version-1.0.2</tag>
     </scm>
 
+    <developers>
+        <developer>
+            <email>oss@fizzed.com</email>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>fizzed</id>
+            <url>https://repos.fizzed.com/repository/maven-snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Sonatype OSS Release Staging Repository</name>
+            <url>${nexus.oss.url}/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
+
     <modules>
-        <module>versionizer-maven-plugin</module>
+        <module>version-maven-plugin</module>
         <module>watcher-maven-plugin</module>
     </modules>
 
@@ -30,16 +63,11 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- Define versions for Maven dependencies -->
+        <nexus.oss.url>https://ossrh-staging-api.central.sonatype.com</nexus.oss.url>
         <!-- Using 3.9.8 targets a modern Maven 3.x line -->
         <maven.api.version>3.9.8</maven.api.version>
-        <!-- Using 3.13.1 for plugin tools is a recent, stable choice -->
         <maven.plugin.tools.version>3.13.1</maven.plugin.tools.version>
     </properties>
-
-    <prerequisites>
-        <maven>3.7.0</maven>
-    </prerequisites>
 
     <build>
         <plugins>
@@ -122,6 +150,7 @@
             <version>${maven.version}</version>
         </dependency>
         <dependency>
+
             <groupId>org.sonatype.plexus</groupId>
             <artifactId>plexus-sec-dispatcher</artifactId>
             <version>1.4</version>
@@ -132,5 +161,46 @@
             <version>1.5.15</version>
         </dependency>-->
     </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- only sign artifacts during release; not snapshots -->
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
