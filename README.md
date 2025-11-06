@@ -1,7 +1,5 @@
 # Maven Plugins by Fizzed
 
-[![Build Status](https://travis-ci.org/fizzed/maven-plugins.svg)](https://travis-ci.org/fizzed/java-maven-plugins)
-
 ## Overview
 
 Collection of Maven plugins for various tasks.
@@ -22,7 +20,100 @@ Project sponsors may include the following benefits:
 - Priority bug fixes
 - Privately hosted continuous integration tests for their unique edge or use cases
 
-## Watcher (fizzed-watcher-maven-plugin)
+# Maven Plugins by Fizzed
+
+## Version Maven Plugin
+
+Provides a plugin to generate Java source code which contains a `Version` class with information about the version of
+the project, the git commit hash, timestamp, etc.  Useful for generating version information in your application and
+including it in the final .jar file, so consumers of your library can see what version they're running.
+
+### Usage
+
+Even if you include the plugin in your project, by default if the `javaPackage` is not specified, it will not generate
+any source code.  You must specify the `javaPackage` to generate source code for the Version class, and that property
+effectively serves as a way to `skip` the plugin. In your Maven pom.xml, add the following:
+
+```xml
+<project>
+    <!-- other pom elements -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.fizzed</groupId>
+                <artifactId>version-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-version-class</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <javaPackage>com.fizzed.project</javaPackage>
+                        </configuration>   
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <!-- other pom elements -->
+</project>
+```
+
+## Hooks Maven Plugin
+
+Provides "hooks" into Maven build process to extract information to be used outside of Maven.  The initial implementation
+provides a `classpath` goal that will return the correct classpath list in a file, so that you can use it directly
+(e.g. to launch a java process yourself). Basically, this is a better "exec-maven-plugin" where you can run classes
+directly.
+
+### Usage
+
+This will compile your project/module, and write the "runtime" classpath to <target>/classpath.txt, which will include
+the "classes" directory and all of its jar dependencies.  For mutli-module projects, this will also include any of the
+modules it depends on.
+
+    mvn compile com.fizzed:hooks-maven-plugin:1.0.7-SNAPSHOT:classpath -Dclasspath.scope=runtime
+
+Same as above, but for test classes, along with the test classpath.
+
+    mvn test-compile com.fizzed:hooks-maven-plugin:1.0.7-SNAPSHOT:classpath -Dclasspath.scope=test
+
+If you prefer to `package` your project, and get a classpath of the produced jars, this will work. Please note that you
+must run `package` first, before running the hook-maven-plugin:classpath goal, otherwise the jar will not exist yet and
+you'll end up with the last module's `classes` directory instead of the jar.
+
+    mvn package com.fizzed:hooks-maven-plugin:1.0.7-SNAPSHOT:classpath -Dclasspath.scope=runtime -DskipTests=true
+
+If you want to always build `classpath.txt` files, you can also add this plugin to run all the time in your project.
+Add the following to your pom.xml:
+
+```xml
+<project>
+    <!-- other pom elements -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.fizzed</groupId>
+                <artifactId>hooks-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>save-classpath</id>
+                        <goals>
+                            <goal>classpath</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <!-- other pom elements -->
+</project>
+```
+
+## Watcher Maven Plugin
 
 Ever wish Maven could run a specific command if any files in your project change? Some IDEs
 have their own features to do X if a file changes, but they usually don't take your full Maven
@@ -45,8 +136,8 @@ To use add the following to your POM:
         ...
         <plugin>
             <groupId>com.fizzed</groupId>
-            <artifactId>fizzed-watcher-maven-plugin</artifactId>
-            <version>1.0.6</version>
+            <artifactId>watcher-maven-plugin</artifactId>
+            <version>2.0.0</version>
             <configuration>
                 <touchFile>target/classes/watcher.txt</touchFile>
                 <watches>
@@ -85,91 +176,16 @@ watching a directory, but excluding files with a suffix of *.html.
 You may add any number of exclude and include entries.  The recursive property
 can be set to true/false to disable/enable recursively watching a directory.
 
-By default this maven plugin does NOT attach to a lifecycle -- since it is 
+By default this maven plugin does NOT attach to a lifecycle -- since it is
 essentially a daemon that runs forever.  Usually, you'll run this in a separate
 shell and run via:
 
 ```bash
-mvn fizzed-watcher:run
-```
-
-## Versionizer (fizzed-versionizer-maven-plugin)
-
-Maven plugin that generates a Java source file containing artifact
-version info. This is compiled and included with the final artifact.
-An alternative to using Jar manifest files for extracting version info
-from a library. The directory the file is output to is also added to your
-project as a directory containing Java sources (and will be automatically
-picked up during the compile phase).
-
-To use add the following to your POM:
-
-```xml
-<build>
-    <plugins>
-        ...
-        <plugin>
-            <groupId>com.fizzed</groupId>
-            <artifactId>fizzed-versionizer-maven-plugin</artifactId>
-            <version>1.0.6</version>
-            <executions>
-                <execution>
-                    <id>generate-version-class</id>
-                    <goals>
-                        <goal>generate</goal>
-                    </goals>
-                    <configuration>
-                        <javaPackage>com.fizzed.examples.helloworld</javaPackage>
-                    </configuration>
-                </execution>
-            </executions> 
-        </plugin>
-        ...
-    </plugins>
-</build>
-```
-
-By default this will generate a Version.java source file in:
-
-    ${project.build.directory}/generated-sources/versionizer
-
-
-## Play (fizzed-play-maven-plugin)
-
-Maven plugin that does a best-effort compile of PlayFramework 2.x templates
-(file.scala.html) into a Java source file.  This plugin is primarily a hack
-to make Netbeans function to code complete PlayFramework projects using a pom.xml
-file.
-
-Templates are generated to ${project.build.directory}/generated-sources/play-templates
-
-To use add the following to your POM:
-
-```xml
-<build>
-    <plugins>
-        ...
-        <plugin>
-            <groupId>com.fizzed</groupId>
-            <artifactId>fizzed-play-maven-plugin</artifactId>
-            <version>1.0.6</version>
-            <executions>
-                <execution>
-                    <id>best-effort-play-template-compiler</id>
-                    <phase>generate-sources</phase>
-                    <goals>
-                        <goal>template-compile</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-        ...
-    </plugins>
-</build>
+mvn com.fizzed:watcher-maven-plugin:2.0.0:run
 ```
 
 ## License
 
-Copyright (C) 2015 Fizzed, Inc.
+Copyright (C) 2015+ Fizzed, Inc.
 
 This work is licensed under the Apache License, Version 2.0. See LICENSE for details.
