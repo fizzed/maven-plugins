@@ -1,13 +1,26 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fizzed</groupId>
-    <artifactId>fizzed-maven-plugins</artifactId>
+    <artifactId>maven-plugins</artifactId>
+    <name>maven-plugins</name>
     <packaging>pom</packaging>
-    <name>${project.artifactId}</name>
     <version>1.0.7-SNAPSHOT</version>
     <description>Parent pom for all Fizzed Maven plugin projects</description>
     <url>https://github.com/fizzed/java-maven-plugins</url>
-    
+
+    <inceptionYear>2016</inceptionYear>
+
+    <organization>
+        <name>Fizzed, Inc</name>
+        <url>http://fizzed.com</url>
+    </organization>
+
+    <prerequisites>
+        <maven>3.2.5</maven>
+    </prerequisites>
+
     <licenses>
         <license>
             <name>Apache 2</name>
@@ -15,18 +28,13 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
-    <organization>
-        <name>Fizzed Inc</name>
-        <url>http://fizzed.com</url>
-    </organization>
-    
+
     <scm>
-        <url>https://github.com/fizzed/java-maven-plugins</url>
-        <connection>scm:git:git@github.com:fizzed/java-maven-plugins.git</connection>
+        <url>https://github.com/fizzed/maven-plugins</url>
+        <connection>scm:git:git@github.com:fizzed/maven-plugins.git</connection>
         <tag>version-1.0.2</tag>
     </scm>
-    
+
     <developers>
         <developer>
             <email>oss@fizzed.com</email>
@@ -35,138 +43,88 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype OSS Snapshots Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>fizzed</id>
+            <url>https://repos.fizzed.com/repository/maven-snapshots</url>
         </snapshotRepository>
         <repository>
             <id>sonatype-nexus-staging</id>
             <name>Sonatype OSS Release Staging Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <url>${nexus.oss.url}/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
 
     <modules>
-        <module>versionizer</module>
-	<module>play</module>
-        <module>watcher</module>
+        <module>version-maven-plugin</module>
+        <module>watcher-maven-plugin</module>
+        <module>hooks-maven-plugin</module>
     </modules>
+
+    <properties>
+        <maven.version>3.9.0</maven.version>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <nexus.oss.url>https://ossrh-staging-api.central.sonatype.com</nexus.oss.url>
+        <!-- Using 3.9.8 targets a modern Maven 3.x line -->
+        <maven.api.version>3.9.8</maven.api.version>
+        <maven.plugin.tools.version>3.13.1</maven.plugin.tools.version>
+    </properties>
 
     <build>
         <plugins>
+            <!-- The maven-plugin-plugin is what reads your annotations -->
+            <!-- (@Mojo, @Parameter) and generates the necessary -->
+            <!-- plugin descriptor files (plugin.xml) for Maven to understand. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.4</version>
-                <configuration>
-                    <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
-                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                </configuration>
+                <version>${maven.plugin.tools.version}</version>
                 <executions>
                     <execution>
-                        <id>mojo-descriptor</id>
+                        <id>default-descriptor</id>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>descriptor</goal>
                         </goals>
                     </execution>
-                    <!-- if you want to generate help goal -->
                     <execution>
                         <id>help-goal</id>
                         <goals>
                             <goal>helpmojo</goal>
                         </goals>
+                        <phase>process-classes</phase>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-maven-plugin</artifactId>
-                <version>1.3.8</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>descriptor</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
-                <configuration>
-                    <debug>true</debug>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <!-- use @ for propert to be interpolated -->
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
             </plugin>
         </plugins>
     </build>
-    
-    <profiles>
-        <profile>
-            <!-- only sign artificats during release; not snapshots -->
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <dependencies>
+        <!-- Core API for creating a Mojo (Maven Old Java Object) -->
         <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>${maven.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Provides access to the Maven project object, build session, etc. -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>${maven.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Required for using annotations like @Mojo, @Parameter, etc. -->
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>${maven.plugin.tools.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--<dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven.version}</version>
@@ -193,6 +151,7 @@
             <version>${maven.version}</version>
         </dependency>
         <dependency>
+
             <groupId>org.sonatype.plexus</groupId>
             <artifactId>plexus-sec-dispatcher</artifactId>
             <version>1.4</version>
@@ -201,12 +160,48 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
             <version>1.5.15</version>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
-    <properties>
-        <maven.version>3.1.0</maven.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+    <profiles>
+        <profile>
+            <!-- only sign artifacts during release; not snapshots -->
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.8</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
